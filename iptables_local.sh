@@ -69,17 +69,19 @@ while IFS= read -r LINE; do
             # fi
 
             #This is for a more strict set or rules that requre a -s flag and source ip based on established connections
-            if [[ "$PORT" =~ ^[0-9]+$ ]] ; then
+            if [ "$PORT" -eq 22 ] || [ "$PORT" -gt 32768 ]; then # ignore ssh and ephemeral ports
+                continue
+            elif [[ "$PORT" =~ ^[0-9]+$ ]] ; then
                 SRCADDR=$(echo "$ESTAB_LINE" | awk '{print $6}'| cut -d: -f1)
                 echo "iptables -A INPUT -s $SRCADDR -p $PROTO --dport $PORT -j ACCEPT" >> "$IPTABLES_FILE"
                 SOMETHING_RETURN=1
             fi
 
         done < "$ESTAB_LINES"
-
-        if [ $SOMETHING_RETURN -eq 0 ]; then
-            echo "iptables -A INPUT -p $PROTO --dport $PORT -j ACCEPT" >> "$IPTABLES_FILE"
-        fi
+        #This you would uncomment if you are going with the less strict set of rules
+        # if [ $SOMETHING_RETURN -eq 0 ]; then
+        #     echo "iptables -A INPUT -p $PROTO --dport $PORT -j ACCEPT" >> "$IPTABLES_FILE"
+        # fi
 
     fi
 done < "$OPEN_PORTS_FILE"
