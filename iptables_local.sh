@@ -8,8 +8,8 @@ ESTAB_LINES="established_lines.txt"
 > "$OPEN_PORTS_FILE"
 > "$IPTABLES_FILE"
 > "$ESTAB_LINES"
-REMOTE_CMD="ss -tulnap | grep -v :: | grep -v WAIT | sort "
-#REMOTE_CMD="ss -tulnap | grep -v 127.0.0 | grep -v :: | grep -v WAIT" / The correct CMD for auditing remote hosts
+#REMOTE_CMD="ss -tulnap | grep -v :: | grep -v WAIT | sort " / for testing on local machine
+REMOTE_CMD="ss -tulnap | grep -v 127.0.0 | grep -v :: | grep -v WAIT | sort " 
 
 while IFS= read -r HOST <&3 || [ -n "$HOST" ]; do
     echo "==== $HOST ====" >> "$OPEN_PORTS_FILE"
