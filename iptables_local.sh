@@ -8,8 +8,8 @@ ESTAB_LINES="established_lines.txt"
 > "$OPEN_PORTS_FILE"
 > "$IPTABLES_FILE"
 > "$ESTAB_LINES"
-#REMOTE_CMD="ss -tulnap | grep -v :: | grep -v WAIT | sort " / for testing on local machine
-REMOTE_CMD="ss -tulnap | grep -v 127.0.0 | grep -v :: | grep -v WAIT | sort " 
+REMOTE_CMD="ss -tulnap | grep -v :: | grep -v WAIT | sort "
+#REMOTE_CMD="ss -tulnap | grep -v 127.0.0 | grep -v :: | grep -v WAIT" / The correct CMD for auditing remote hosts
 
 while IFS= read -r HOST <&3 || [ -n "$HOST" ]; do
     echo "==== $HOST ====" >> "$OPEN_PORTS_FILE"
@@ -61,7 +61,15 @@ while IFS= read -r LINE; do
 
         while IFS= read -r ESTAB_LINE; do
             
-            if [[ "$PORT" =~ ^[0-9]+$ ]] && [ "$PORT" = $(echo "$ESTAB_LINE" | awk '{print $5}'| cut -d: -f2) ] ; then
+            #This is if you want a less strict set of iptable rules that dont all require a -s flag amd sourceip/subnet
+            # if [[ "$PORT" =~ ^[0-9]+$ ]] && [ "$PORT" = $(echo "$ESTAB_LINE" | awk '{print $5}'| cut -d: -f2) ] ; then
+            #     SRCADDR=$(echo "$ESTAB_LINE" | awk '{print $6}'| cut -d: -f1)
+            #     echo "iptables -A INPUT -s $SRCADDR -p $PROTO --dport $PORT -j ACCEPT" >> "$IPTABLES_FILE"
+            #     SOMETHING_RETURN=1
+            # fi
+
+            #This is for a more strict set or rules that requre a -s flag and source ip based on established connections
+            if [[ "$PORT" =~ ^[0-9]+$ ]] ; then
                 SRCADDR=$(echo "$ESTAB_LINE" | awk '{print $6}'| cut -d: -f1)
                 echo "iptables -A INPUT -s $SRCADDR -p $PROTO --dport $PORT -j ACCEPT" >> "$IPTABLES_FILE"
                 SOMETHING_RETURN=1
