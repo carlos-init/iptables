@@ -61,7 +61,7 @@ while IFS= read -r LINE; do
 
         while IFS= read -r ESTAB_LINE; do
             
-            if [[ "$PORT" =~ ^[0-9]+$ ]] && [ "$PORT" = $(echo "$ESTAB_LINE" | awk '{print $6}'| cut -d: -f2) ] ; then
+            if [[ "$PORT" =~ ^[0-9]+$ ]] && [ "$PORT" = $(echo "$ESTAB_LINE" | awk '{print $5}'| cut -d: -f2) ] ; then
                 SRCADDR=$(echo "$ESTAB_LINE" | awk '{print $6}'| cut -d: -f1)
                 echo "iptables -A INPUT -s $SRCADDR -p $PROTO --dport $PORT -j ACCEPT" >> "$IPTABLES_FILE"
                 SOMETHING_RETURN=1
